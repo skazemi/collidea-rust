@@ -3,8 +3,11 @@ name = "collidea"
 version = "0.1.0"
 edition = "2021"
 authors = ["Saeed Kazemi"]
-description = "Collision-prone memory efficient collections"
+categories = ["data-structures"]
+keywords = ["hashmap", "hashset"]
+description = "Collision-prone memory-efficient collections"
 license = "MIT"
+readme = "README.md"
 repository = "https://github.com/skazemi/collidea-rust"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
