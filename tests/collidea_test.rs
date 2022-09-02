@@ -61,7 +61,13 @@ fn collide_set_operator_test() {
     let intersection_b_a = set_b.intersection(&set_a);
     let union_a_b = set_a.union(&set_b);
     let union_b_a = set_b.union(&set_a);
+    let difference_a_b = set_a.difference(&set_b);
+    let difference_b_a = set_b.difference(&set_a);
+    let symmetric_difference_a_b = set_a.symmetric_difference(&set_b);
+    let symmetric_difference_b_a = set_b.symmetric_difference(&set_a);
 
+    assert_eq!(set_a.is_empty(), false);
+    assert_eq!(set_b.is_empty(), false);
     assert_eq!(union_a_b.len(), size);
     assert_eq!(union_b_a.len(), size);
     assert_eq!(intersection_a_b.len(), a_end - b_start);
@@ -81,5 +87,63 @@ fn collide_set_operator_test() {
             intersection_b_a.contains(&element),
             i >= b_start && i < a_end
         );
+        assert_eq!(difference_a_b.contains(&element), i < b_start);
+        assert_eq!(difference_b_a.contains(&element), i >= a_end);
+        assert_eq!(
+            difference_a_b.contains(&element) && difference_b_a.contains(&element),
+            false
+        );
+        assert_eq!(
+            symmetric_difference_a_b.contains(&element),
+            i < b_start || i >= a_end
+        );
+        assert_eq!(
+            symmetric_difference_a_b.contains(&element),
+            symmetric_difference_b_a.contains(&element)
+        );
+        assert_eq!(
+            intersection_a_b.contains(&element) ^ symmetric_difference_a_b.contains(&element),
+            true
+        );
     }
+
+    assert_eq!(
+        set_a.is_subset(&union_a_b) && set_b.is_subset(&union_a_b),
+        true
+    );
+    assert_eq!(
+        union_a_b.is_subset(&union_b_a) && union_b_a.is_subset(&union_a_b),
+        true
+    );
+    assert_eq!(
+        intersection_a_b.is_subset(&set_a) && intersection_a_b.is_subset(&set_b),
+        true
+    );
+    assert_eq!(
+        intersection_a_b.is_subset(&intersection_b_a)
+            && intersection_b_a.is_subset(&intersection_a_b),
+        true
+    );
+    assert_eq!(difference_a_b.is_subset(&set_a), true);
+    assert_eq!(difference_b_a.is_subset(&set_b), true);
+    assert_eq!(difference_a_b.is_subset(&symmetric_difference_a_b), true);
+    assert_eq!(difference_b_a.is_subset(&symmetric_difference_b_a), true);
+    assert_eq!(intersection_a_b.is_subset(&union_a_b), true);
+    assert_eq!(symmetric_difference_a_b.is_subset(&union_a_b), true);
+    assert_eq!(
+        symmetric_difference_a_b.is_subset(&symmetric_difference_b_a)
+            && symmetric_difference_b_a.is_subset(&symmetric_difference_a_b),
+        true
+    );
+    assert_eq!(
+        set_a.is_disjoint(&difference_b_a) && set_b.is_disjoint(&difference_a_b),
+        true
+    );
+    assert_eq!(
+        intersection_a_b.is_disjoint(&symmetric_difference_a_b),
+        true
+    );
+    assert_eq!(difference_a_b.is_disjoint(&difference_b_a), true);
+    assert_eq!(difference_a_b.is_disjoint(&intersection_a_b), true);
+    assert_eq!(difference_b_a.is_disjoint(&intersection_b_a), true);
 }

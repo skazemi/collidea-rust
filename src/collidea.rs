@@ -25,8 +25,12 @@ impl<K: Hash, V> CollideMap<K, V> {
         }
     }
 
+    pub fn capacity(&self) -> usize {
+        self.inner.capacity()
+    }
+
     pub fn clear(&mut self) {
-        self.inner.clear();
+        self.inner.clear()
     }
 
     pub fn contains_key(&self, k: &K) -> bool {
@@ -45,12 +49,24 @@ impl<K: Hash, V> CollideMap<K, V> {
         self.inner.insert(get_hash_xxh(k), v)
     }
 
+    pub fn is_empty(&self) -> bool {
+        self.inner.is_empty()
+    }
+
     pub fn len(&self) -> usize {
         self.inner.len()
     }
 
     pub fn remove(&mut self, k: &K) -> Option<V> {
         self.inner.remove(&get_hash_xxh(k))
+    }
+
+    pub fn reserve(&mut self, additional: usize) {
+        self.inner.reserve(additional)
+    }
+
+    pub fn shrink_to_fit(&mut self) {
+        self.inner.shrink_to_fit()
     }
 
     pub fn values(&self) -> impl Iterator<Item = &V> {
@@ -76,8 +92,12 @@ impl<K: Hash> CollideSet<K> {
         }
     }
 
+    pub fn capacity(&self) -> usize {
+        self.inner.capacity()
+    }
+
     pub fn clear(&mut self) {
-        self.inner.clear();
+        self.inner.clear()
     }
 
     pub fn contains(&self, k: &K) -> bool {
@@ -88,6 +108,18 @@ impl<K: Hash> CollideSet<K> {
         self.inner.insert(get_hash_xxh(&k))
     }
 
+    pub fn is_disjoint(&self, other: &CollideSet<K>) -> bool {
+        self.inner.is_disjoint(&other.inner)
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.inner.is_empty()
+    }
+
+    pub fn is_subset(&self, other: &CollideSet<K>) -> bool {
+        self.inner.is_subset(&other.inner)
+    }
+
     pub fn len(&self) -> usize {
         self.inner.len()
     }
@@ -96,17 +128,35 @@ impl<K: Hash> CollideSet<K> {
         self.inner.remove(&get_hash_xxh(k))
     }
 
-    pub fn union(&self, other: &CollideSet<K>) -> CollideSet<K> {
-        let union_m = self.inner.union(&other.inner);
-        let mut union: CollideSet<K> = CollideSet::new();
-        union.inner = union_m.map(|k| k.clone()).collect();
-        union
+    pub fn reserve(&mut self, additional: usize) {
+        self.inner.reserve(additional)
+    }
+
+    pub fn difference(&self, other: &CollideSet<K>) -> CollideSet<K> {
+        let mut result: CollideSet<K> = CollideSet::new();
+        result.inner = self.inner.difference(&other.inner).cloned().collect();
+        result
+    }
+
+    pub fn symmetric_difference(&self, other: &CollideSet<K>) -> CollideSet<K> {
+        let mut result: CollideSet<K> = CollideSet::new();
+        result.inner = self
+            .inner
+            .symmetric_difference(&other.inner)
+            .cloned()
+            .collect();
+        result
     }
 
     pub fn intersection(&self, other: &CollideSet<K>) -> CollideSet<K> {
-        let intersection_m = self.inner.intersection(&other.inner);
-        let mut intersection: CollideSet<K> = CollideSet::new();
-        intersection.inner = intersection_m.map(|k| k.clone()).collect();
-        intersection
+        let mut result: CollideSet<K> = CollideSet::new();
+        result.inner = self.inner.intersection(&other.inner).cloned().collect();
+        result
+    }
+
+    pub fn union(&self, other: &CollideSet<K>) -> CollideSet<K> {
+        let mut result: CollideSet<K> = CollideSet::new();
+        result.inner = self.inner.union(&other.inner).cloned().collect();
+        result
     }
 }
